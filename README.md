@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # D-Mart API — Grocery Store Backend
 
 > **Round 2 · Full Stack Developer Practical Assessment**
@@ -201,3 +202,6 @@ The AI was used to:
 - Design the return/exchange eligibility and inventory restock logic
 
 All business logic, architectural decisions, and final code review were performed by the developer.
+=======
+# Mini-Dmart-prototypeByEknathKatole
+>>>>>>> 9f4e5449126f6d6dbb4d6e2dead830566c83fbff
