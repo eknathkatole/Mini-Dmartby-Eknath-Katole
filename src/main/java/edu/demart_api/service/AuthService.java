@@ -6,7 +6,14 @@ import edu.demart_api.dto.response.AuthResponse;
 
 public interface AuthService {
 
+    /** Public registration — always creates a CUSTOMER account */
     AuthResponse register(RegisterRequest request);
-    AuthResponse login(LoginRequest request);
-}
 
+    AuthResponse login(LoginRequest request);
+
+    /**
+     * Admin-only — creates an account with the specified role (STAFF or ADMIN).
+     * Callable only from a secured admin endpoint.
+     */
+    AuthResponse createUserWithRole(RegisterRequest request, String role);
+}

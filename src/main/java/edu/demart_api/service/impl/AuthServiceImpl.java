@@ -29,29 +29,15 @@ public class AuthServiceImpl implements AuthService {
         this.jwtService = jwtService;
     }
 
+    // ─── Public Registration (always CUSTOMER) ───────────────────────────────
+
     @Override
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new BusinessException("Email is already registered");
-        }
-        if (userRepository.existsByPhone(request.getPhone())) {
-            throw new BusinessException("Phone number is already registered");
-        }
-
-        User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setPhone(request.getPhone());
-        user.setRole(Role.CUSTOMER);
-        user.setActive(true);
-
-        userRepository.save(user);
-
-        String token = jwtService.generateToken(user.getEmail(), user.getRole().name(), user.getId());
-        return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
+        return createAccount(request, Role.CUSTOMER);
     }
+
+    // ─── Login ───────────────────────────────────────────────────────────────
 
     @Override
     public AuthResponse login(LoginRequest request) {
@@ -67,6 +53,48 @@ public class AuthServiceImpl implements AuthService {
         }
 
         String token = jwtService.generateToken(user.getEmail(), user.getRole().name(), user.getId());
+        return toAuthResponse(user, token);
+    }
+
+    // ─── Admin: Create STAFF or ADMIN account ────────────────────────────────
+
+    @Override
+    @Transactional
+    public AuthResponse createUserWithRole(RegisterRequest request, String roleName) {
+        Role role;
+        try {
+            role = Role.valueOf(roleName.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new BusinessException("Invalid role: " + roleName + ". Allowed: CUSTOMER, STAFF, ADMIN");
+        }
+        return createAccount(request, role);
+    }
+
+    // ─── Shared Internal Helper ───────────────────────────────────────────────
+
+    private AuthResponse createAccount(RegisterRequest request, Role role) {
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new BusinessException("Email is already registered");
+        }
+        if (userRepository.existsByPhone(request.getPhone())) {
+            throw new BusinessException("Phone number is already registered");
+        }
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPhone(request.getPhone());
+        user.setRole(role);
+        user.setActive(true);
+
+        userRepository.save(user);
+
+        String token = jwtService.generateToken(user.getEmail(), user.getRole().name(), user.getId());
+        return toAuthResponse(user, token);
+    }
+
+    private AuthResponse toAuthResponse(User user, String token) {
         return new AuthResponse(token, user.getId(), user.getName(), user.getEmail(), user.getRole().name());
     }
 }
