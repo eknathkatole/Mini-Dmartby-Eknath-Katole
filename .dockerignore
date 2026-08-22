@@ -1,0 +1,11 @@
+target/
+.git/
+.mvn/
+*.log
+.classpath
+.project
+.settings/
+.env
+application-local.properties
+README.md
+SECURITY.md
