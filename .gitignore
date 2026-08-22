@@ -5,6 +5,7 @@ target/
 .settings/
 
 .env
+application-local.properties
 
 *.log
 
