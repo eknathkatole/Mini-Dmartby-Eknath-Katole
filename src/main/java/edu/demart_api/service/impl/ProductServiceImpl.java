@@ -12,6 +12,7 @@ import edu.demart_api.exception.ResourceNotFoundException;
 import edu.demart_api.repository.CategoryRepository;
 import edu.demart_api.repository.ProductRepository;
 import edu.demart_api.service.ProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,10 +38,14 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public PageResponse<ProductResponse> getAll(String search, Long categoryId,
                                                  boolean inStockOnly, Pageable pageable) {
-        return PageResponse.of(
-                productRepository.findAllWithFilters(search, categoryId, inStockOnly, pageable)
-                        .map(this::toResponse)
-        );
+        String cleanSearch = (search != null && !search.isBlank()) ? search.trim() : null;
+        Page<Product> page;
+        if (cleanSearch != null) {
+            page = productRepository.searchProducts(cleanSearch, categoryId, inStockOnly, pageable);
+        } else {
+            page = productRepository.findAllWithCategoryAndStock(categoryId, inStockOnly, pageable);
+        }
+        return PageResponse.of(page.map(this::toResponse));
     }
 
     @Override
