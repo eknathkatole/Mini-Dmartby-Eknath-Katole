@@ -12,28 +12,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
- * Central Spring Security configuration.
- *
- * Route Access Matrix:
- * ┌──────────────────────────────┬────────────────────────────┐
- * │ Path Pattern                 │ Allowed Roles              │
- * ├──────────────────────────────┼────────────────────────────┤
- * │ POST /api/v1/auth/**         │ PUBLIC (no token needed)   │
- * │ GET  /api/v1/health          │ PUBLIC                     │
- * │ GET  /api/v1/categories/**   │ PUBLIC                     │
- * │ GET  /api/v1/products/**     │ PUBLIC                     │
- * │ /api/v1/admin/**             │ ADMIN only                 │
- * │ /api/v1/staff/**             │ STAFF + ADMIN              │
- * │ Everything else              │ Any authenticated user     │
- * └──────────────────────────────┴────────────────────────────┘
- *
- * Fine-grained access control is applied via @PreAuthorize on individual
- * controller methods (enabled by @EnableMethodSecurity below).
+ * Central Spring Security configuration with CORS support for frontend clients.
  */
 @Configuration
-@EnableMethodSecurity          // enables @PreAuthorize / @PostAuthorize on methods
+@EnableMethodSecurity
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -45,6 +34,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+            // Enable CORS with our custom configuration source below
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             // Disable CSRF — stateless REST API; Bearer token provides equivalent protection
             .csrf(AbstractHttpConfigurer::disable)
 
@@ -93,10 +85,22 @@ public class SecurityConfig {
     }
 
     /**
-     * Exposes the AuthenticationManager bean — required to prevent Spring Boot
-     * from auto-generating a random security password and InMemoryUserDetailsManager.
-     * Our app uses JWT exclusively so we don't need the default UserDetailsService.
+     * Configures CORS to allow requests from any frontend origin (localhost or deployed URLs)
      */
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOriginPatterns(List.of("*"));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setExposedHeaders(List.of("Authorization"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
+    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
         return config.getAuthenticationManager();
