@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ReturnExchangeServiceImpl implements ReturnExchangeService {
 
     private static final int RETURN_WINDOW_DAYS = 7;

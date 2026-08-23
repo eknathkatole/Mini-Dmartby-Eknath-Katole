@@ -20,7 +20,7 @@ public class Product extends BaseEntity {
 
     // ─── Category ────────────────────────────────────────────────────────────
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 

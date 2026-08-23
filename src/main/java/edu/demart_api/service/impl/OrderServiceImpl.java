@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class OrderServiceImpl implements OrderService {
 
     private static final BigDecimal FREE_DELIVERY_THRESHOLD = new BigDecimal("500.00");

@@ -22,6 +22,7 @@ import java.math.RoundingMode;
 import java.util.List;
 
 @Service
+@Transactional(readOnly = true)
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
