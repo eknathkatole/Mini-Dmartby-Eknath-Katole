@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterRequest {
+public class StaffApplicationRequest {
 
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -19,16 +19,14 @@ public class RegisterRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, max = 100, message = "Password must be between 8 and 100 characters")
-    private String password;
-
-    private String confirmPassword;
-
     @NotBlank(message = "Phone number is required")
     @Pattern(
         regexp = "^[6-9]\\d{9}$",
         message = "Invalid Indian phone number"
     )
     private String phone;
+
+    private String storeName;
+
+    private String reason;
 }

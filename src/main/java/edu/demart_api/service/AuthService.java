@@ -1,19 +1,34 @@
 package edu.demart_api.service;
 
-import edu.demart_api.dto.request.LoginRequest;
-import edu.demart_api.dto.request.RegisterRequest;
+import edu.demart_api.dto.request.*;
 import edu.demart_api.dto.response.AuthResponse;
+import edu.demart_api.dto.response.StaffApplicationResponse;
+
+import java.util.List;
 
 public interface AuthService {
 
-    /** Public registration — always creates a CUSTOMER account */
     AuthResponse register(RegisterRequest request);
+
+    String sendRegistrationOtp(SendRegistrationOtpRequest request);
+
+    AuthResponse verifyRegistrationOtp(VerifyRegistrationOtpRequest request);
 
     AuthResponse login(LoginRequest request);
 
-    /**
-     * Admin-only — creates an account with the specified role (STAFF or ADMIN).
-     * Callable only from a secured admin endpoint.
-     */
     AuthResponse createUserWithRole(RegisterRequest request, String role);
+
+    String forgotPassword(ForgotPasswordRequest request);
+
+    void resetPassword(ResetPasswordRequest request);
+
+    // ─── Staff / Restaurant Partner Application Flow ───────────────────────────
+
+    StaffApplicationResponse applyForStaff(StaffApplicationRequest request);
+
+    List<StaffApplicationResponse> getStaffApplications(String status);
+
+    AuthResponse approveStaffApplication(Long id, ApproveStaffApplicationRequest request);
+
+    void rejectStaffApplication(Long id, String reason);
 }

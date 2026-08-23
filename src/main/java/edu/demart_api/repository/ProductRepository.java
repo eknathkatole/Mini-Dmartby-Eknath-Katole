@@ -3,7 +3,6 @@ package edu.demart_api.repository;
 import edu.demart_api.entity.Product;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,16 +13,13 @@ import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @EntityGraph(attributePaths = {"category"})
     Optional<Product> findByIdAndActiveTrue(Long id);
 
     // ─── Public Browse / Search / Filter ─────────────────────────────────────
 
     /**
      * Search products when search term is provided.
-     * Uses @EntityGraph to eagerly fetch category entity, avoiding LazyInitializationException.
      */
-    @EntityGraph(attributePaths = {"category"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.active = true
@@ -39,9 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     /**
      * Category & stock filtering when no search term is present.
-     * Uses @EntityGraph to eagerly fetch category entity, avoiding LazyInitializationException.
      */
-    @EntityGraph(attributePaths = {"category"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.active = true
@@ -55,14 +49,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // ─── Admin / Staff ────────────────────────────────────────────────────────
 
     /** All products (including inactive) — for admin management view */
-    @EntityGraph(attributePaths = {"category"})
     Page<Product> findAll(Pageable pageable);
 
     /**
      * Low stock alert — products whose stockQuantity is at or below their own
      * minStockAlert threshold.
      */
-    @EntityGraph(attributePaths = {"category"})
     @Query("""
             SELECT p FROM Product p
             WHERE p.active = true
@@ -73,7 +65,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findLowStockProducts();
 
     /** Out-of-stock products — for admin restocking dashboard */
-    @EntityGraph(attributePaths = {"category"})
     @Query("SELECT p FROM Product p WHERE p.active = true AND p.stockQuantity = 0")
     List<Product> findOutOfStockProducts();
 

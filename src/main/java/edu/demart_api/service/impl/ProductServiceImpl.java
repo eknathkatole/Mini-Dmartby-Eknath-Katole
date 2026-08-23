@@ -36,7 +36,6 @@ public class ProductServiceImpl implements ProductService {
     // ─── Public ──────────────────────────────────────────────────────────────
 
     @Override
-    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAll(String search, Long categoryId,
                                                  boolean inStockOnly, Pageable pageable) {
         String cleanSearch = (search != null && !search.isBlank()) ? search.trim() : null;
@@ -50,7 +49,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ProductResponse getById(Long id) {
         Product product = productRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
@@ -60,7 +58,6 @@ public class ProductServiceImpl implements ProductService {
     // ─── Admin ───────────────────────────────────────────────────────────────
 
     @Override
-    @Transactional(readOnly = true)
     public PageResponse<ProductResponse> getAllAdmin(Pageable pageable) {
         return PageResponse.of(
                 productRepository.findAll(pageable).map(this::toResponse)
@@ -136,7 +133,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ProductResponse> getLowStockProducts() {
         return productRepository.findLowStockProducts()
                 .stream()
@@ -145,7 +141,6 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ProductResponse> getOutOfStockProducts() {
         return productRepository.findOutOfStockProducts()
                 .stream()

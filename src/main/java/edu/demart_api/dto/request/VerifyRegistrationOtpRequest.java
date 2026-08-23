@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RegisterRequest {
+public class VerifyRegistrationOtpRequest {
 
     @NotBlank(message = "Name is required")
     @Size(min = 2, max = 100, message = "Name must be between 2 and 100 characters")
@@ -31,4 +31,7 @@ public class RegisterRequest {
         message = "Invalid Indian phone number"
     )
     private String phone;
+
+    @NotBlank(message = "OTP is required")
+    private String otp;
 }
